@@ -24,8 +24,8 @@ token = TOKEN_BOT
 dp = Dispatcher()
 
 @dp.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
-    await message.answer(f"Привет, {message.from_user.full_name}!"
+async def cmd_start(message: Message) -> None:
+    await message.answer(f"Привет, {message.from_user.first_name}!"
                          f"я могу кратко отвечать на твои вопросы"
                          f"задай интересующий тебя вопрос и я постараюсь ответить как можно более кратко")
 
