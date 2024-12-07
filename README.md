@@ -17,5 +17,5 @@ ___
 
 # Запуск бота
 
-python3 bot.py - для Linux
-python .\bot.py - для windows
+- python3 bot.py - для Linux
+- python .\bot.py - для windows
