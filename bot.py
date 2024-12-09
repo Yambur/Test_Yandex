@@ -7,9 +7,9 @@ from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from secret import TOKEN_BOT, REDIS_URL
-from YandexAPI import get_response_from_yandex_gpt
-from fsm import ChatStates
-from markup import get_main_menu
+from api.YandexAPI import get_response_from_yandex_gpt
+from states.fsm import ChatStates
+from keyboards.markup import get_main_menu
 
 logging.basicConfig(level=logging.INFO)
 
@@ -33,6 +33,9 @@ async def yandexgpt_start(message: types.Message, state: FSMContext):
 
 @dp.message(ChatStates.waiting_for_question)
 async def handle_question(message: types.Message, state: FSMContext):
+    # Подсматриваем вопрос пользователя
+    logging.info(f"User question: {message.text}")
+
     loading_message = await message.answer("Loading…")
     response = get_response_from_yandex_gpt(message.text)
     response_json = response.json()
