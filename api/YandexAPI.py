@@ -1,42 +1,33 @@
-import requests
-from requests import Response
-import os
-
-from secret import API_KEY, FOLDER_ID
-
-# Переменные для API
-api_key = API_KEY
-folder_id = FOLDER_ID
-
-url = 'https://llm.api.cloud.yandex.net/foundationModels/v1/completion'
-
-headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Api-Key {api_key}',
-    'X-Folder-Id': folder_id
-}
+import aiohttp
+from aiohttp import ClientSession
 
 
-def get_response_from_yandex_gpt(message: str) -> Response:
-    data = {
-        "modelUri": f"gpt://{folder_id}/yandexgpt-lite/latest",
-        "completionOptions": {
-            "stream": False,
-            "temperature": 0.6,
-            "maxTokens": "1000"
-        },
-        "messages": [
-            {
-                "role": "system",
-                "text": "Отвечай как можно более кратко"
+class YandexApi:
+    def __init__(self, api_key: str, folder_id: str):
+        self.api_key = api_key
+        self.folder_id = folder_id
+        self.url = 'https://llm.api.cloud.yandex.net/foundationModels/v1/completion'
+        self.headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Api-Key {self.api_key}',
+            'X-Folder-Id': self.folder_id
+        }
+
+    async def get_response_from_yandex_gpt(self, message: str, session: ClientSession, dialog: list) -> dict:
+        data = {
+            "modelUri": f"gpt://{self.folder_id}/yandexgpt-lite/latest",
+            "completionOptions": {
+                "stream": False,
+                "temperature": 0.6,
+                "maxTokens": "1000"
             },
-            {
-                "role": "user",
-                "text": message
-            }
-        ]
-    }
+            "messages": dialog + [
+                {
+                    "role": "user",
+                    "text": message
+                }
+            ]
+        }
 
-    response = requests.post(url, json=data, headers=headers)
-
-    return response
+        async with session.post(self.url, json=data, headers=self.headers) as response:
+            return await response.json()
